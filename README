@@ -1,0 +1,13 @@
+Test Android Application
+
+Objective of this Project - To develop an app that can show weather of different Cities depending upon settings selected by user
+
+Completeled So far - App contains an main activity that consist of a Text View and a Fragment
+Text View Display the name of app where as fragment consist of an ListView that displays 7 days of weather condition data.
+Weather Map API used to extract weather conditions data for any city using postal code and Storing required data in String array to add to List View
+
+Problem Faced - 
+Major Problem -String array returned from AsyncTask's doInBackground(), that consist of 7 days of weather condition data is to be populated in ListView in fragment contained in Main Activity
+Unable to populate List View
+However Weather API and String array that contains weather information for 7 days is checked to be corrext using LogCat
+Problem 2-Unable to parse correct date from JSON string received
