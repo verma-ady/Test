@@ -1,6 +1,7 @@
 package com.example.mukesh.test;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,8 +21,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -59,6 +64,12 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
 
+        if( id==R.id.action_settings ) {
+            Intent intent= new Intent(this, SettingsActivity.class );
+            startActivity(intent);
+            return true;
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
@@ -74,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
             if (params.length == 0) {
                 return null;
             }
+
 
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
@@ -120,6 +132,12 @@ public class MainActivity extends AppCompatActivity {
 
                 stringJSON = buffer.toString();
                 Log.v(LOG_TAG, " STring JSON " + stringJSON);
+            } catch( ConnectException e ){
+                Toast.makeText(getApplicationContext(), "Cannot Connect To Website " ,Toast.LENGTH_SHORT ).show();
+            } catch( SocketTimeoutException e ){
+                Toast.makeText(getApplicationContext(), "Cannot Connect To Website " ,Toast.LENGTH_SHORT ).show();
+            } catch( UnknownHostException e ){
+                Toast.makeText(getApplicationContext(), "No Internet Connection " ,Toast.LENGTH_SHORT ).show();
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error", e);
                 //return ;
@@ -145,11 +163,13 @@ public class MainActivity extends AppCompatActivity {
 
         }//doinbackground
 
+
+
         @Override
-            protected void onPostExecute( String res[] ){
-                ArrayAdapter<String> week;
-                if(res!=null){
-                    try {
+        protected void onPostExecute( String res[] ){
+            ArrayAdapter<String> week;
+            if(res!=null){
+                try {
                     Fragment frag = getFragmentManager().findFragmentById(R.id.fragment);
 //                        Log.v(LOG_TAG, "set_adapter1" );
                     ListView lv = (ListView) findViewById(R.id.daylist);
@@ -165,12 +185,13 @@ public class MainActivity extends AppCompatActivity {
                     //week = new ArrayAdapter<String>(this, R.layout.fragment_listview, R.id.listhead, Aweek );
                     //week = new ArrayAdapter<String>(this, R.layout.activity_main, R.id.listhead, Aweek );
                     lv.setAdapter((ArrayAdapter<String>) week);
+                    Toast.makeText(getApplicationContext(), "Updating", Toast.LENGTH_LONG).show();
 //                        Log.v(LOG_TAG, "set_adapter7");
-                    }catch (Exception e ){
+                }catch (Exception e ){
                     Log.v(LOG_TAG, "set_adapter" );
-                    }
                 }
             }
+        }
 
 
         private String getDate ( long JSONdate ){
