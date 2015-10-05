@@ -1,7 +1,6 @@
 package com.example.mukesh.test;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -35,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
     public MainActivity(){
     }
 
+    static  String stringJSON = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -65,12 +66,16 @@ public class MainActivity extends AppCompatActivity {
         }
 
         if( id==R.id.action_settings ) {
-            Intent intent= new Intent(this, SettingsActivity.class );
-            startActivity(intent);
+//            Intent intent= new Intent(this, SettingsActivity.class );
+//            startActivity(intent);
             return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    public static String getStringJSON(){
+        return stringJSON;
     }
 
     public class fetchweather extends AsyncTask<String , Void, String[]> {
@@ -80,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
 //        }
         private final String LOG_TAG = fetchweather.class.getSimpleName();
 
-        protected  String[] doInBackground(String... params) {
+        protected String[] doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
@@ -90,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
 
-            String stringJSON = null;
             String modeS = "json";
             String unitsS = "metric";
             int num = 7;
@@ -131,7 +135,12 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 stringJSON = buffer.toString();
+
                 Log.v(LOG_TAG, " STring JSON " + stringJSON);
+                String[] str=new String[1];
+                str[0]=stringJSON;
+//                Pair<String, Integer > p = new Pair<>(stringJSON, num );
+                return str;
             } catch( ConnectException e ){
                 Toast.makeText(getApplicationContext(), "Cannot Connect To Website " ,Toast.LENGTH_SHORT ).show();
             } catch( SocketTimeoutException e ){
@@ -154,21 +163,33 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
 
-            try {
-                return getweather(stringJSON, num );
-            } catch (JSONException e) {
-                Log.v(LOG_TAG, "getweather func crash");
-                return null;
-            }
 
+            return new String[0];
         }//doinbackground
 
 
 
         @Override
-        protected void onPostExecute( String res[] ){
+        protected void onPostExecute( String JSON[] ){
             ArrayAdapter<String> week;
+            JSONObject numJSON = null;
+            int num=0;
+            try {
+                numJSON = new JSONObject(JSON[0]);
+                num= numJSON.getInt("cnt");
+                Log.v(LOG_TAG, "onPostExecute" + Integer.toString(num));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            String res[]=new String[num];
+            try {
+                 res =  getweather(JSON[0], num );
+            } catch (JSONException e) {
+                Log.v(LOG_TAG, "getweather func crash");
+            }
+
             if(res!=null){
+                Toast.makeText(getApplicationContext(), "Updating", Toast.LENGTH_SHORT).show();
                 try {
                     Fragment frag = getFragmentManager().findFragmentById(R.id.fragment);
 //                        Log.v(LOG_TAG, "set_adapter1" );
@@ -185,18 +206,13 @@ public class MainActivity extends AppCompatActivity {
                     //week = new ArrayAdapter<String>(this, R.layout.fragment_listview, R.id.listhead, Aweek );
                     //week = new ArrayAdapter<String>(this, R.layout.activity_main, R.id.listhead, Aweek );
                     lv.setAdapter((ArrayAdapter<String>) week);
-                    Toast.makeText(getApplicationContext(), "Updating", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Updated", Toast.LENGTH_SHORT).show();
 //                        Log.v(LOG_TAG, "set_adapter7");
                 }catch (Exception e ){
+                    Toast.makeText(getApplicationContext(), "Update Failed", Toast.LENGTH_SHORT).show();
                     Log.v(LOG_TAG, "set_adapter" );
                 }
             }
-        }
-
-
-        private String getDate ( long JSONdate ){
-            SimpleDateFormat shortDate = new SimpleDateFormat("EEE MMM dd");
-            return shortDate.format(JSONdate);
         }
 
         private String formattemp( double high, double low ){
@@ -221,8 +237,12 @@ public class MainActivity extends AppCompatActivity {
 //                Log.v(LOG_TAG, "getweather4");
                 desc=dateJSON.getString("main");
 //                Log.v(LOG_TAG, "getweather5");
-                day = getDate(dayJSON.getLong("dt"));
-//                Log.v(LOG_TAG, "getweather6"+ day);
+
+                long date = System.currentTimeMillis() + (86400_000*i);
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+                day = sdf.format(date);
+//
+//              Log.v(LOG_TAG, "getweather6"+ day);
                 JSONObject tempJSON = dayJSON.getJSONObject("temp");
 //                Log.v(LOG_TAG, "getweather7");
                 double high = tempJSON.getDouble("max");

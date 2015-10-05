@@ -2,7 +2,7 @@ Test Android Application
 
 Objective of this Project - To develop an app that can show weather of different Cities depending upon settings selected by user
 
-Completeled So far - App now display 7Days of data for a city
+Completeled So far - App now is able to show correct data with latest dates and more weather information can be viewed by clicking on following date
 
-Problem Faced - 
-Problem 2-Unable to parse correct date from JSON string received
+Problems - App crash without Internet
+No Settings Option yet

@@ -7,6 +7,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+
 public class weatherActivity extends AppCompatActivity {
 
     @Override
@@ -15,10 +21,37 @@ public class weatherActivity extends AppCompatActivity {
         setContentView(R.layout.activity_weather);
         TextView tv= (TextView)findViewById(R.id.onClick);
         Intent intent = getIntent();
-        if(intent!=null && intent.hasExtra(intent.EXTRA_TEXT)){
-            String value = intent.getStringExtra(intent.EXTRA_TEXT);
-            tv.setText(value);
+        if(intent!=null && intent.hasExtra(Intent.EXTRA_TEXT) && intent.hasExtra(Intent.EXTRA_KEY_EVENT) ){
+            String JSONv = intent.getStringExtra(Intent.EXTRA_TEXT);
+            int pos = intent.getIntExtra(Intent.EXTRA_KEY_EVENT, 0 );
+
+            try {
+                JSONObject JSON= new JSONObject(JSONv);
+                JSONArray l = JSON.getJSONArray("list");
+                JSONObject day = l.getJSONObject(pos);
+
+                long date = System.currentTimeMillis() + (86400_000*pos);
+                SimpleDateFormat sdf = new SimpleDateFormat("MMM dd, yyyy");
+                String dateS = sdf.format(date);
+
+                JSONObject temp = day.getJSONObject("temp");
+                double high= temp.getDouble("max");
+                double low= temp.getDouble("min");
+                int hum = day.getInt("humidity");
+                JSONArray wea = day.getJSONArray("weather");
+                JSONObject w = wea.getJSONObject(0);
+                String desc = w.getString("description");
+
+                String print = dateS + " : " + desc + "\n" + "Maximum Temperature is : " + Double.toString(high)
+                        +  "\n" + "Minimum Temperature is : " + Double.toString(low) + "\n" +
+                        "Humidity in Atmosphere is : " + Integer.toString(hum);
+                tv.setText(print);
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 
     @Override
@@ -37,11 +70,10 @@ public class weatherActivity extends AppCompatActivity {
 
         //noinspection SimplifiableIfStatement
         if( id==R.id.action_settings ) {
-            Intent intent= new Intent(this, SettingsActivity.class );
-            startActivity(intent);
+//            Intent intent= new Intent(this, SettingsActivity.class );
+//            startActivity(intent);
             return true;
         }
-
 
         return super.onOptionsItemSelected(item);
     }
