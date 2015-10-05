@@ -185,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     //week = new ArrayAdapter<String>(this, R.layout.fragment_listview, R.id.listhead, Aweek );
                     //week = new ArrayAdapter<String>(this, R.layout.activity_main, R.id.listhead, Aweek );
                     lv.setAdapter((ArrayAdapter<String>) week);
-                    Toast.makeText(getApplicationContext(), "Updating", Toast.LENGTH_LONG).show();
+                    Toast.makeText(getApplicationContext(), "Updating", Toast.LENGTH_SHORT).show();
 //                        Log.v(LOG_TAG, "set_adapter7");
                 }catch (Exception e ){
                     Log.v(LOG_TAG, "set_adapter" );
