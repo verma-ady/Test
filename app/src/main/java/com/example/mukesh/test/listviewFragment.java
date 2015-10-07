@@ -35,9 +35,6 @@ public class listviewFragment extends Fragment {
         final String list[] = {"1 Jan - Clear - 36/14", "1 Jan - Clear - 36/14", "1 Jan - Clear - 36/14", "1 Jan - Clear - 36/14",
                         "1 Jan - Clear - 36/14", "1 Jan - Clear - 36/14", "1 Jan - Clear - 36/14",};
         //String list[] = {"Today", "Tomorrow", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Next Sunday" };
-//        MainActivity activity= new MainActivity();
-//        MainActivity.fetchweather fetch=new MainActivity.fetchweather();
-//        fetch.execute("110085");
 
         ArrayAdapter<String> weekforecast;
 

@@ -22,7 +22,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
-import java.net.SocketTimeoutException;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
@@ -78,14 +79,14 @@ public class MainActivity extends AppCompatActivity {
         return stringJSON;
     }
 
-    public class fetchweather extends AsyncTask<String , Void, String[]> {
+    public class fetchweather extends AsyncTask<String , Void, String> {
 
         //        public fetchweather(String){
 //
 //        }
         private final String LOG_TAG = fetchweather.class.getSimpleName();
 
-        protected String[] doInBackground(String... params) {
+        protected String doInBackground(String... params) {
 
             if (params.length == 0) {
                 return null;
@@ -136,19 +137,20 @@ public class MainActivity extends AppCompatActivity {
 
                 stringJSON = buffer.toString();
 
-                Log.v(LOG_TAG, " STring JSON " + stringJSON);
-                String[] str=new String[1];
-                str[0]=stringJSON;
+                Log.v(LOG_TAG, " String JSON " + stringJSON);
+//                String[] str=new String[1];
+//                str[0]=stringJSON;
 //                Pair<String, Integer > p = new Pair<>(stringJSON, num );
-                return str;
-            } catch( ConnectException e ){
-                Toast.makeText(getApplicationContext(), "Cannot Connect To Website " ,Toast.LENGTH_SHORT ).show();
-            } catch( SocketTimeoutException e ){
-                Toast.makeText(getApplicationContext(), "Cannot Connect To Website " ,Toast.LENGTH_SHORT ).show();
-            } catch( UnknownHostException e ){
-                Toast.makeText(getApplicationContext(), "No Internet Connection " ,Toast.LENGTH_SHORT ).show();
+                return stringJSON;
+            } catch (ConnectException | ProtocolException | MalformedURLException e) {
+                //Toast.makeText(getApplicationContext(), "Cannot Connect To Website ", Toast.LENGTH_SHORT).show();
+                stringJSON = null;
+            } catch (UnknownHostException e) {
+                //Toast.makeText(getApplicationContext(), "No Internet Connection " ,Toast.LENGTH_SHORT ).show();
+                stringJSON = null;
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Error", e);
+                stringJSON = null;
                 //return ;
             } finally {
                 if (urlConnection != null) {
@@ -162,20 +164,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-
-
-            return new String[0];
+            return "null";
         }//doinbackground
 
 
 
         @Override
-        protected void onPostExecute( String JSON[] ){
+        protected void onPostExecute( String JSON ){
             ArrayAdapter<String> week;
             JSONObject numJSON = null;
             int num=0;
+            if( JSON == "null"  ){
+                Toast.makeText(getApplicationContext(), "Unable to Connect To Internet", Toast.LENGTH_SHORT ).show();
+                return ;
+            }
+
             try {
-                numJSON = new JSONObject(JSON[0]);
+                numJSON = new JSONObject(JSON);
                 num= numJSON.getInt("cnt");
                 Log.v(LOG_TAG, "onPostExecute" + Integer.toString(num));
             } catch (JSONException e) {
@@ -183,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
             }
             String res[]=new String[num];
             try {
-                 res =  getweather(JSON[0], num );
+                 res =  getweather(JSON, num );
             } catch (JSONException e) {
                 Log.v(LOG_TAG, "getweather func crash");
             }
@@ -192,20 +197,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(getApplicationContext(), "Updating", Toast.LENGTH_SHORT).show();
                 try {
                     Fragment frag = getFragmentManager().findFragmentById(R.id.fragment);
-//                        Log.v(LOG_TAG, "set_adapter1" );
                     ListView lv = (ListView) findViewById(R.id.daylist);
-//                        Log.v(LOG_TAG, "set_adapter2" );
                     ArrayList<String> Aweek = new ArrayList<String>(Arrays.asList(res));
-//                        Log.v(LOG_TAG, "set_adapter3" );
-                    week = (ArrayAdapter<String>) lv.getAdapter();
-//                        Log.v(LOG_TAG, "set_adapter4" );
-                    week.clear();
-//                        Log.v(LOG_TAG, "set_adapter5");
-                    week.addAll(res);
-//                        Log.v(LOG_TAG, "set_adapter6");
-                    //week = new ArrayAdapter<String>(this, R.layout.fragment_listview, R.id.listhead, Aweek );
-                    //week = new ArrayAdapter<String>(this, R.layout.activity_main, R.id.listhead, Aweek );
-                    lv.setAdapter((ArrayAdapter<String>) week);
+                    week = (ArrayAdapter<String>) lv.getAdapter(); // get attached adapter to list
+                    week.clear(); // make adapter clear
+                    week.addAll(res); // add a ArrayList
+                    lv.setAdapter((ArrayAdapter<String>) week); // set adapter to list
                     Toast.makeText(getApplicationContext(), "Updated", Toast.LENGTH_SHORT).show();
 //                        Log.v(LOG_TAG, "set_adapter7");
                 }catch (Exception e ){

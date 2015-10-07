@@ -18,7 +18,6 @@ public class splash extends Activity {
             public void run() {
                 try{
                     sleep(1000);
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 } finally {
@@ -29,9 +28,9 @@ public class splash extends Activity {
         };
         thread.start();
     }
+
     protected void pause(){
         super.onPause();
         finish();
     }
-
 }
