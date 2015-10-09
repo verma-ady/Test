@@ -6,7 +6,7 @@
         android:title="@string/pref_header_general" />
 
     <header
-        android:fragment="com.example.mukesh.test.SettingsActivity$NotificationPreferenceFragment"
+        android:fragment="com.example.mukesh.test.SettingsActivity$unitsPreferenceFragment"
         android:title="Units" />
 
 </preference-headers>

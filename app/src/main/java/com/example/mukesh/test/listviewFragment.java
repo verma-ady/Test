@@ -7,7 +7,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -45,9 +44,7 @@ public class listviewFragment extends Fragment {
         final ListView listview = (ListView) rootview.findViewById(R.id.daylist);
         listview.setAdapter(weekforecast);
 
-
-        //Log.v("Fragment", JSONString);
-        listview.setOnItemClickListener(new OnItemClickListener() {
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
                 String value;
@@ -59,13 +56,13 @@ public class listviewFragment extends Fragment {
                     Intent intent = new Intent(getActivity(), weatherActivity.class).putExtra(Intent.EXTRA_TEXT, JSONString)
                             .putExtra(Intent.EXTRA_KEY_EVENT, position);
                     startActivity(intent);
-                }
-                else{
-                    Toast.makeText(getActivity(),"No Internet Connection", Toast.LENGTH_SHORT );
+                } else {
+                    Toast.makeText(getActivity(), "No Internet Connection", Toast.LENGTH_SHORT);
                 }
             }
         });
 
+        //Log.v("Fragment", JSONString);
         return rootview;
     }
 }

@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.refresh_button) {
             fetchweather fetch = new fetchweather();
-            fetch.execute("110085");
+            fetch.execute("110001");
             return true;
         }
 
@@ -105,15 +105,18 @@ public class MainActivity extends AppCompatActivity {
                 final String mode = "mode";
                 final String units = "units";
                 final String cnt = "cnt";
+                final String apiid = "APPID";
 
                 Uri uri = Uri.parse(Base).buildUpon()
                         .appendQueryParameter(Code, params[0]).appendQueryParameter(mode, modeS)
-                        .appendQueryParameter(units, unitsS).appendQueryParameter(cnt, Integer.toString(num)).build();
+                        .appendQueryParameter(units, unitsS).appendQueryParameter(cnt, Integer.toString(num))
+                        .appendQueryParameter(apiid, getResources().getString(R.string.api_id)).build();
 
                 URL url = new URL(uri.toString());
                 Log.v(LOG_TAG, "URL is " + uri.toString());
 
-//                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+//                URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043
+//                          &mode=json&units=metric&cnt=7&APPID=cbd60623f1bc97ca29a4cee966319209");
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
@@ -144,15 +147,14 @@ public class MainActivity extends AppCompatActivity {
                 return stringJSON;
             } catch (ConnectException | ProtocolException | MalformedURLException e) {
                 //Toast.makeText(getApplicationContext(), "Cannot Connect To Website ", Toast.LENGTH_SHORT).show();
-                stringJSON = null;
+                stringJSON = "null_internet";
             } catch (UnknownHostException e) {
                 //Toast.makeText(getApplicationContext(), "No Internet Connection " ,Toast.LENGTH_SHORT ).show();
-                stringJSON = null;
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Error", e);
-                stringJSON = null;
-                //return ;
-            } finally {
+                stringJSON = "null_internet";
+            } catch ( IOException e ) {
+                stringJSON = "null_authentication";
+            } finally
+             {
                 if (urlConnection != null) {
                     urlConnection.disconnect();
                 }
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
-            return "null";
+            return stringJSON;
         }//doinbackground
 
 
@@ -174,8 +176,13 @@ public class MainActivity extends AppCompatActivity {
             ArrayAdapter<String> week;
             JSONObject numJSON = null;
             int num=0;
-            if( JSON == "null"  ){
+            if( JSON == "null_internet"  ){
                 Toast.makeText(getApplicationContext(), "Unable to Connect To Internet", Toast.LENGTH_SHORT ).show();
+                return ;
+            }
+
+            if( JSON == "null_authentication"  ){
+                Toast.makeText(getApplicationContext(), "Unable to Authenticate API key ", Toast.LENGTH_SHORT ).show();
                 return ;
             }
 
